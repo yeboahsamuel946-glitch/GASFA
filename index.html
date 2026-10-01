@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GASFA - Ghana Audit Service</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+<h2 class="site-brand"><img src="./images/mylogo.jpg" alt="Ghana Audit Service logo"><span>GASFA</span></h2>
+<div>
+<span id="userInfo"></span>
+<button id="showLoginBtn" onclick="showLogin()">Login</button>
+<button id="showSignupBtn" onclick="showSignup()">Sign up</button>
+<button id="logoutBtn" class="hidden" onclick="logout()">Logout</button>
+</div>
+</header>
+
+<div class="container">
+    <!-- Homepage sliders -->
+
+       <section class="slider_container">
+    <section class="slider">
+      <div class="slide one">
+        <img src="./images/img5.jpg" alt="">
+      </div>
+      <div class="slide two">
+        <img src="./images/img1.jpg" alt="">
+      </div>
+      <div class="slide three">
+        <img src="./images/img2.jpg" alt="">
+      </div>
+      <div class="slide four">
+        <img src="./images/img3.jpg" alt="">
+      </div>
+      <div class="slide five">
+        <img src="./images/img4.jpg" alt="">
+      </div>
+      <div class="slide one" aria-hidden="true">
+        <img src="./images/img5.jpg" alt="">
+      </div>
+    </section>
+  </section>
+
+<!-- ================= LOGIN SECTION ================= -->
+<!-- This is login for admin -->
+<div id="loginSection" class="card hidden" style="max-width:400px; margin:0 auto 20px auto; border:2px solid #1e3a8a;">
+<h2 style="text-align:center;">Member Login</h2>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()" class="btn-blue">Login</button>
+<button onclick="hideLogin()" class="btn-cancel">Cancel</button>
+<p id="loginMsg"></p>
+</div>
+
+<div id="signupSection" class="card hidden" style="max-width:400px; margin:0 auto 20px auto; border:2px solid #15803d;">
+<h2 style="text-align:center;">Create Member Account</h2>
+<input id="signupEmail" type="email" placeholder="Email">
+<input id="signupPassword" type="password" placeholder="Password (at least 6 characters)">
+<select id="signupRole">
+<option value="staff">Staff</option>
+<option value="nsp">NSP</option>
+</select>
+<button onclick="signup()" class="btn-green">Create Account</button>
+<button onclick="hideSignup()" class="btn-cancel">Cancel</button>
+<p id="signupMsg"></p>
+</div>
+
+<!-- ================= ADMIN.HTML SECTION ADDED INTO INDEX.HTML ================= -->
+<!-- This was admin.html, now inside index.html -->
+<div id="adminSection" class="hidden">
+<h2 style="margin:15px 0; color:#111;">🔧 Admin Panel</h2>
+<div class="grid">
+<div class="card admin-card"><h3>+ Add News</h3><input id="n_title" placeholder="Title"><textarea id="n_content" placeholder="Content"></textarea><input id="n_opponent" placeholder="Opponent"><select id="n_audience"><option value="all">all - Everyone</option><option value="staff">staff</option><option value="nsp">nsp</option></select><button onclick="addNews()" class="btn-blue">Publish News</button></div>
+<div class="card admin-card"><h3>+ Add Upcoming Match</h3><input id="u_home_team" placeholder="Home team name" required><input id="u_away_team" placeholder="Away team name" required><input id="u_date" type="date" required><input id="u_venue" placeholder="Venue" required><select id="u_audience"><option value="all">all</option><option value="staff">staff</option><option value="nsp">nsp</option></select><button onclick="addUpcomingMatch()" class="btn-green">Save Upcoming Match</button><p id="upcomingMatchMsg" class="form-note" role="status"></p></div>
+<div class="card admin-card"><h3>+ Add Completed Match</h3><input id="m_home_team" placeholder="Home team name" required><label for="m_home_score">Home team goals</label><input id="m_home_score" type="number" min="0" step="1" placeholder="0" required><input id="m_away_team" placeholder="Away team name" required><label for="m_away_score">Away team goals</label><input id="m_away_score" type="number" min="0" step="1" placeholder="0" required><input id="m_date" type="date" required><input id="m_venue" placeholder="Venue" required><select id="m_audience"><option value="all">all</option><option value="staff">staff</option><option value="nsp">nsp</option></select><button onclick="addMatch()" class="btn-green">Save Completed Match</button><p class="form-note">Each save adds a separate match. Saved matches stay listed until deleted.</p><p id="matchFormMsg" role="status"></p></div>
+<div class="card admin-card"><h3>+ Create / Update Player Profile</h3><input id="p_name" placeholder="Player full name" required><label for="p_photo">Player photo</label><input id="p_photo" type="file" accept="image/*"><label for="p_matches">Matches played</label><input id="p_matches" type="number" min="0" step="1" value="0" required><label for="p_goals">Goals scored</label><input id="p_goals" type="number" min="0" step="1" value="0" required><label for="p_assists">Assists</label><input id="p_assists" type="number" min="0" step="1" value="0" required><button onclick="savePlayerProfile()" class="btn-green">Save Player Profile</button><p id="playerProfileMsg" role="status"></p></div>
+</div>
+<h3>Manage News</h3>
+<div id="adminNewsList">Loading news...</div>
+<h3>Manage Matches</h3>
+<div class="admin-match-columns completed-only">
+<section class="admin-match-column completed-only-column">
+<h4>Completed Matches</h4>
+<div id="adminCompletedMatches">Loading completed matches...</div>
+</section>
+</div>
+<h3>Manage Player Profiles</h3>
+<div id="adminPlayerProfilesList">Loading player profiles...</div>
+</div>
+
+<!-- ================= HOME PAGE NEWS & MATCHES ================= -->
+<!-- This is from index.html - shows for everyone -->
+<div class="homepage-columns" style="margin-top:20px;">
+<div>
+<h2 class="section-title-blue listing-heading">Latest News</h2>
+<div id="newsList">Loading...</div>
+</div>
+<div>
+<h2 class="section-title-yellow listing-heading">Football Matches</h2>
+<div id="matchList">Loading...</div>
+</div>
+<div>
+<h2 class="section-title-green listing-heading">Top Players</h2>
+<section class="leaderboard" aria-labelledby="topScorersHeading">
+<h3 id="topScorersHeading">Top Scorers</h3>
+<ol id="topScorersList"><li>Loading...</li></ol>
+</section>
+<section class="leaderboard assists-board" aria-labelledby="topAssistsHeading">
+<h3 id="topAssistsHeading">Top Assists</h3>
+<ol id="topAssistsList"><li>Loading...</li></ol>
+</section>
+<button id="openPlayerProfiles" class="player-profiles-button" type="button" onclick="openPlayerProfiles()">Player Profiles</button>
+</div>
+</div>
+
+</div>
+
+<dialog id="playerProfilesDialog" class="player-profiles-dialog" aria-labelledby="playerProfilesTitle">
+<div class="player-profiles-header">
+<div><p class="player-profiles-kicker">GASFA SQUAD</p><h2 id="playerProfilesTitle">Player Profiles</h2></div>
+<button class="player-profiles-close" type="button" aria-label="Close player profiles" onclick="closePlayerProfiles()">&times;</button>
+</div>
+<div id="playerProfilesList" class="player-profile-grid"><p>Loading player profiles...</p></div>
+</dialog>
+      
+<!-- This is a footer -->
+ 
+  <footer class="footer">
+  	 <div class="container">
+  	 	<div class="row">
+  	 		<div class="footer-col">
+  	 			<h4>company</h4>
+  	 			<ul>
+  	 				<li><a href="mailto:yeboahsamuel946@gmail.com">Contact us</a></li>
+  	 				<li><a href="#">our services</a></li>
+  	 				<li><a href="#">privacy policy</a></li>
+  	 				<li><a href="#">affiliate program</a></li>
+  	 			</ul>
+  	 		</div>
+  	 		<div class="footer-col">
+  	 			<h4>get help</h4>
+  	 			<ul>
+  	 				<li><a href="#">FAQ</a></li>
+  	 				<li><a href="#">payment options</a></li>
+  	 			</ul>
+  	 		</div>
+  	 		
+  	 		<div class="footer-col">
+  	 			<h4>follow us</h4>
+  	 			<div class="social-links">
+  	 				<a href="https://www.facebook.com/" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+  	 				<a href="https://x.com/" aria-label="X (Twitter)" title="X (Twitter)" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+  	 				<a href="https://www.instagram.com/" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+  	 				<a href="https://www.linkedin.com/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+  	 			</div>
+  	 		</div>
+  	 	</div>
+  	 </div>
+  </footer>
+
+<script src="script.js"></script>
+</body>
+</html>
